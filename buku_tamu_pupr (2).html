@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITAMU - Dinas PUPR Kabupaten Intan Jaya</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Poppins & Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        puprBlue: '#113675',
+                        puprBlueDark: '#0b244d',
+                        puprYellow: '#FFCC00',
+                        puprYellowHover: '#e6b800',
+                        puprDark: '#1e293b',
+                        puprGray: '#f8fafc'
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        title: ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #113675;
+            border-radius: 3px;
+        }
+        /* Custom canvas styling for signature */
+        #signature-pad {
+            border: 2px dashed #cbd5e1;
+            cursor: crosshair;
+        }
+        /* Print view styling for PDF generation */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans min-h-screen flex flex-col md:flex-row overflow-x-hidden">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-full md:w-80 bg-puprBlue text-white flex flex-col shadow-2xl z-20">
+        <!-- Brand Identity Header -->
+        <div class="p-6 bg-puprBlueDark border-b border-blue-900 flex items-center space-x-4">
+            <img src="http://googleusercontent.com/image_collection/image_retrieval/367440541303829382_0" alt="Logo PUPR" class="h-14 w-auto object-contain">
+            <div>
+                <h1 class="font-title font-extrabold text-lg leading-tight tracking-wider text-puprYellow">SITAMU</h1>
+                <p class="text-[10px] uppercase font-semibold text-slate-300 tracking-widest">Dinas PUPR Intan Jaya</p>
+            </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+            <button onclick="switchTab('beranda')" id="btn-beranda" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-200 bg-puprYellow text-puprBlue font-bold">
+                <i class="fa-solid fa-house-chimney text-lg w-6"></i> <span>Beranda</span>
+            </button>
+            <button onclick="switchTab('form-tamu')" id="btn-form-tamu" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-200 text-slate-300 hover:bg-blue-900 hover:text-white">
+                <i class="fa-solid fa-user-pen text-lg w-6"></i> <span>Form Buku Tamu</span>
+            </button>
+            <button onclick="switchTab('data-kunjungan')" id="btn-data-kunjungan" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-200 text-slate-300 hover:bg-blue-900 hover:text-white">
+                <i class="fa-solid fa-address-book text-lg w-6"></i> <span>Data Kunjungan</span>
+            </button>
+            <button onclick="switchTab('rekap-harian')" id="btn-rekap-harian" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-200 text-slate-300 hover:bg-blue-900 hover:text-white">
+                <i class="fa-solid fa-calendar-day text-lg w-6"></i> <span>Rekap Harian</span>
+            </button>
+            <button onclick="switchTab('rekap-bulanan')" id="btn-rekap-bulanan" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-200 text-slate-300 hover:bg-blue-900 hover:text-white">
+                <i class="fa-solid fa-calendar-days text-lg w-6"></i> <span>Rekap Bulanan</span>
+            </button>
+            <button onclick="switchTab('dashboard-stats')" id="btn-dashboard-stats" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-200 text-slate-300 hover:bg-blue-900 hover:text-white">
+                <i class="fa-solid fa-chart-pie text-lg w-6"></i> <span>Dashboard Statistik</span>
+            </button>
+            <button onclick="switchTab('cetak-laporan')" id="btn-cetak-laporan" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-200 text-slate-300 hover:bg-blue-900 hover:text-white">
+                <i class="fa-solid fa-print text-lg w-6"></i> <span>Cetak Laporan</span>
+            </button>
+            
+            <div class="pt-6 border-t border-blue-900 my-4"></div>
+            
+            <button onclick="switchTab('dev-hub')" id="btn-dev-hub" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-200 text-emerald-400 hover:bg-emerald-950 hover:text-emerald-300 font-medium">
+                <i class="fa-solid fa-code text-lg w-6"></i> <span>Setup Script & Sheets</span>
+            </button>
+        </nav>
+
+        <!-- Admin Login Footer Section -->
+        <div class="p-4 bg-puprBlueDark border-t border-blue-900 flex flex-col gap-2">
+            <div id="admin-logged-out" class="flex items-center justify-between">
+                <span class="text-xs text-slate-400">Status: Tamu/Operator</span>
+                <button onclick="switchTab('login-admin')" class="bg-puprYellow hover:bg-puprYellowHover text-puprBlue text-xs font-bold px-3 py-1.5 rounded-lg transition">
+                    <i class="fa-solid fa-lock mr-1"></i> Login Admin
+                </button>
+            </div>
+            <div id="admin-logged-in" class="hidden flex items-center justify-between">
+                <span class="text-xs text-green-400"><i class="fa-solid fa-circle-check mr-1 animate-pulse"></i> Administrator</span>
+                <button onclick="logoutAdmin()" class="bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-x-hidden">
+        
+        <!-- TOP HEADER BAR -->
+        <header class="bg-white shadow-sm border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
+            <div class="flex items-center space-x-3">
+                <div class="bg-puprYellow/10 p-2.5 rounded-xl">
+                    <i class="fa-solid fa-building-circle-check text-puprBlue text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="font-title font-bold text-lg text-puprDark">Dinas Pekerjaan Umum & Penataan Ruang</h2>
+                    <p class="text-xs text-slate-500">Kabupaten Intan Jaya - Provinsi Papua Tengah</p>
+                </div>
+            </div>
+            <!-- Live Date Time Clock -->
+            <div class="text-right flex items-center space-x-2 bg-slate-100 px-4 py-2 rounded-lg border border-slate-200">
+                <i class="fa-regular fa-clock text-puprBlue font-semibold"></i>
+                <span id="live-clock" class="text-sm font-semibold text-slate-700">Memuat waktu...</span>
+            </div>
+        </header>
+
+        <!-- CONTAINER FOR VIEWS -->
+        <div class="p-6 max-w-7xl mx-auto w-full flex-grow">
+            
+            <!-- 1. BERANDA VIEW -->
+            <section id="view-beranda" class="tab-view block space-y-6">
+                <!-- Welcome Banner with PUPR Brand Pattern Overlay -->
+                <div class="relative bg-gradient-to-r from-puprBlue to-puprBlueDark text-white rounded-3xl p-8 md:p-12 shadow-xl overflow-hidden">
+                    <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl">
+                        <i class="fa-solid fa-helmet-safety"></i>
+                    </div>
+                    <div class="relative z-10 max-w-2xl">
+                        <span class="bg-puprYellow text-puprBlue font-extrabold text-xs uppercase px-3 py-1 rounded-full tracking-wider">Aplikasi Resmi</span>
+                        <h2 class="font-title font-extrabold text-3xl md:text-4xl mt-4 leading-tight">Sistem Buku Tamu Digital (SITAMU)</h2>
+                        <p class="text-slate-300 mt-3 text-base leading-relaxed">Selamat datang di kantor Dinas PUPR Kabupaten Intan Jaya. Silakan tertibkan kunjungan Anda dengan mengisi form buku tamu digital demi kemudahan koordinasi pelayanan.</p>
+                        <div class="mt-8 flex flex-wrap gap-4">
+                            <button onclick="switchTab('form-tamu')" class="bg-puprYellow hover:bg-puprYellowHover text-puprBlue font-extrabold px-6 py-3 rounded-xl shadow-lg transition duration-200 flex items-center space-x-2">
+                                <i class="fa-solid fa-pencil"></i> <span>Isi Buku Tamu Sekarang</span>
+                            </button>
+                            <button onclick="openQrModal()" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-6 py-3 rounded-xl backdrop-blur transition duration-200 flex items-center space-x-2 border border-white/20">
+                                <i class="fa-solid fa-qrcode"></i> <span>Tampilkan QR Code Mandiri</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Dashboard Grid Row -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 flex items-center space-x-4">
+                        <div class="p-4 bg-blue-100 rounded-xl text-puprBlue text-2xl"><i class="fa-solid fa-users"></i></div>
+                        <div>
+                            <span class="text-xs text-slate-500 font-medium">Hari Ini</span>
+                            <h4 id="stat-today" class="text-2xl font-bold text-slate-800">12 Orang</h4>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 flex items-center space-x-4">
+                        <div class="p-4 bg-amber-100 rounded-xl text-amber-600 text-2xl"><i class="fa-solid fa-calendar-check"></i></div>
+                        <div>
+                            <span class="text-xs text-slate-500 font-medium">Bulan Ini</span>
+                            <h4 id="stat-month" class="text-2xl font-bold text-slate-800">148 Orang</h4>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 flex items-center space-x-4">
+                        <div class="p-4 bg-emerald-100 rounded-xl text-emerald-600 text-2xl"><i class="fa-solid fa-building-columns"></i></div>
+                        <div>
+                            <span class="text-xs text-slate-500 font-medium">Instansi Teraktif</span>
+                            <h4 id="stat-top-instansi" class="text-lg font-bold text-slate-800 truncate max-w-[150px]">BPKAD</h4>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 flex items-center space-x-4">
+                        <div class="p-4 bg-indigo-100 rounded-xl text-indigo-600 text-2xl"><i class="fa-solid fa-user-tie"></i></div>
+                        <div>
+                            <span class="text-xs text-slate-500 font-medium">Terbanyak Dikunjungi</span>
+                            <h4 id="stat-top-staff" class="text-lg font-bold text-slate-800 truncate max-w-[150px]">Kabid Bina Marga</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Cards / Guide Layout -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                    <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200">
+                        <h3 class="font-title font-bold text-lg text-slate-800 mb-4 flex items-center"><i class="fa-solid fa-circle-info text-puprBlue mr-2"></i> Petunjuk Pengisian Buku Tamu</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start space-x-3">
+                                <span class="bg-puprYellow text-puprBlue rounded-full w-6 h-6 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">1</span>
+                                <span class="text-sm text-slate-600">Klik tombol <strong>Form Buku Tamu</strong> pada navigasi kiri atau tombol kuning di atas.</span>
+                            </li>
+                            <li class="flex items-start space-x-3">
+                                <span class="bg-puprYellow text-puprBlue rounded-full w-6 h-6 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">2</span>
+                                <span class="text-sm text-slate-600">Lengkapi data diri Anda, pilih bidang instansi, dan tentukan pegawai yang ingin dituju secara rinci.</span>
+                            </li>
+                            <li class="flex items-start space-x-3">
+                                <span class="bg-puprYellow text-puprBlue rounded-full w-6 h-6 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">3</span>
+                                <span class="text-sm text-slate-600">Bubuhkan <strong>tanda tangan digital</strong> pada panel canvas yang tersedia di bagian akhir form.</span>
+                            </li>
+                            <li class="flex items-start space-x-3">
+                                <span class="bg-puprYellow text-puprBlue rounded-full w-6 h-6 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">4</span>
+                                <span class="text-sm text-slate-600">Gunakan fitur kamera untuk swafoto identitas tamu (opsional), lalu klik <strong>Simpan Data</strong>.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-title font-bold text-lg text-slate-800 mb-2 flex items-center"><i class="fa-solid fa-location-dot text-red-500 mr-2"></i> Kantor Dinas PUPR Intan Jaya</h3>
+                            <p class="text-sm text-slate-600">Pusat Pemerintahan Kabupaten Intan Jaya, Distrik Sugapa, Provinsi Papua Tengah. Selalu patuhi standar operasional kantor dinas demi kenyamanan bersama.</p>
+                        </div>
+                        <div class="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200 flex items-center space-x-4">
+                            <i class="fa-solid fa-headset text-3xl text-slate-400"></i>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-700">Hubungi Helpdesk Layanan</h4>
+                                <p class="text-xs text-slate-500">Jika mengalami kendala pengisian aplikasi: admin.pupr@intanjayakab.go.id</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. FORM BUKU TAMU VIEW -->
+            <section id="view-form-tamu" class="tab-view hidden bg-white rounded-3xl p-6 md:p-8 shadow-md border border-slate-200">
+                <div class="border-b border-slate-200 pb-4 mb-6">
+                    <h3 class="font-title font-bold text-xl text-slate-800">Formulir Buku Tamu Digital</h3>
+                    <p class="text-xs text-slate-500">Silakan isi seluruh informasi di bawah ini secara lengkap.</p>
+                </div>
+
+                <form id="form-tamu-el" onsubmit="event.preventDefault(); submitFormTamu();" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Left Side Fields -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="nama">Nama Lengkap <span class="text-red-500">*</span></label>
+                            <input type="text" id="nama" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-puprBlue focus:border-puprBlue outline-none text-slate-800 transition" placeholder="Masukkan nama lengkap Anda">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="instansi">Instansi / Perusahaan <span class="text-red-500">*</span></label>
+                            <input type="text" id="instansi" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-puprBlue focus:border-puprBlue outline-none text-slate-800 transition" placeholder="Contoh: BPKAD / PT. Maju Mandiri / Pribadi">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="nohp">Nomor HP / WhatsApp <span class="text-red-500">*</span></label>
+                                <input type="tel" id="nohp" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-puprBlue focus:border-puprBlue outline-none text-slate-800 transition" placeholder="08xxxxxxxxxx">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="tanggal">Tanggal Kunjungan</label>
+                                <input type="date" id="tanggal" readonly class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-500 outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="alamat">Alamat Tamu</label>
+                            <textarea id="alamat" rows="2" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-puprBlue focus:border-puprBlue outline-none text-slate-800 transition" placeholder="Alamat tinggal atau domisili instansi"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="bidang">Bidang yang Dituju <span class="text-red-500">*</span></label>
+                                <select id="bidang" required onchange="updateStaffOptions()" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-puprBlue focus:border-puprBlue outline-none text-slate-800 transition">
+                                    <option value="" disabled selected>-- Pilih Bidang --</option>
+                                    <option value="Sekretariat">Sekretariat</option>
+                                    <option value="Bina Marga">Bidang Bina Marga</option>
+                                    <option value="SDA">Bidang Sumber Daya Air</option>
+                                    <option value="Cipta Karya">Bidang Cipta Karya</option>
+                                    <option value="Tata Ruang">Bidang Tata Ruang</option>
+                                    <option value="Bina Konstruksi">Bidang Bina Konstruksi</option>
+                                    <option value="Kepala Dinas">Kepala Dinas</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="pegawai">Pegawai / Pejabat Tujuan <span class="text-red-500">*</span></label>
+                                <select id="pegawai" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-puprBlue focus:border-puprBlue outline-none text-slate-800 transition">
+                                    <option value="" disabled selected>Pilih Bidang Terlebih Dahulu</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="tujuan">Tujuan Kunjungan / Keperluan <span class="text-red-500">*</span></label>
+                            <textarea id="tujuan" required rows="2" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-puprBlue focus:border-puprBlue outline-none text-slate-800 transition" placeholder="Tuliskan alasan kedatangan secara rinci"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Right Side Interactive Panel (Signature & Photo Capture) -->
+                    <div class="space-y-4 flex flex-col justify-between">
+                        <!-- Tanda Tangan Digital -->
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label class="block text-sm font-semibold text-slate-700">Tanda Tangan Digital <span class="text-red-500">*</span></label>
+                                <button type="button" onclick="clearSignature()" class="text-xs text-red-500 hover:text-red-600 font-bold transition">
+                                    <i class="fa-solid fa-eraser mr-1"></i> Bersihkan
+                                </button>
+                            </div>
+                            <div class="bg-white rounded-xl overflow-hidden shadow-inner">
+                                <canvas id="signature-pad" class="w-full h-44 bg-white"></canvas>
+                            </div>
+                            <p class="text-[10px] text-slate-400 mt-1"><i class="fa-solid fa-circle-info mr-1"></i> Gambar menggunakan jari (Layar Sentuh) atau tetikus mouse Anda.</p>
+                        </div>
+
+                        <!-- Foto Tamu Simulator (Atau Gunakan Media Device) -->
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Ambil Foto Tamu <span class="text-slate-400 text-xs">(Opsional)</span></label>
+                            <div class="flex items-center space-x-4">
+                                <div id="camera-container" class="relative w-36 h-28 bg-slate-200 rounded-xl border border-slate-300 flex items-center justify-center overflow-hidden shadow-inner shrink-0">
+                                    <video id="webcam" class="hidden absolute top-0 left-0 w-full h-full object-cover" autoplay playsinline></video>
+                                    <canvas id="photo-canvas" class="hidden absolute top-0 left-0 w-full h-full object-cover"></canvas>
+                                    <div id="camera-placeholder" class="text-center text-slate-400">
+                                        <i class="fa-solid fa-camera text-2xl"></i>
+                                        <p class="text-[9px] mt-1 font-semibold">Webcam Mati</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <button type="button" id="btn-start-camera" onclick="startCamera()" class="px-3 py-1.5 bg-slate-600 text-white rounded-lg text-xs font-bold hover:bg-slate-700 transition flex items-center">
+                                        <i class="fa-solid fa-power-off mr-1.5"></i> Aktifkan Kamera
+                                    </button>
+                                    <button type="button" id="btn-capture" disabled onclick="capturePhoto()" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition flex items-center opacity-50 cursor-not-allowed">
+                                        <i class="fa-solid fa-circle-dot mr-1.5"></i> Ambil Jepretan
+                                    </button>
+                                    <button type="button" id="btn-reset-photo" onclick="resetPhoto()" class="px-3 py-1.5 bg-red-500 text-white rounded-lg text-xs font-bold hover:bg-red-600 transition flex items-center hidden">
+                                        <i class="fa-solid fa-rotate mr-1.5"></i> Ulangi
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons Row -->
+                        <div class="flex items-center space-x-4 pt-2">
+                            <button type="button" onclick="resetFormTamu()" class="flex-1 py-3 px-4 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-rotate-right"></i> <span>Reset Form</span>
+                            </button>
+                            <button type="submit" class="flex-[2] py-3 px-4 bg-puprBlue hover:bg-puprBlueDark text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-floppy-disk text-puprYellow"></i> <span>Simpan Data Tamu</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+
+            <!-- 3. DATA KUNJUNGAN VIEW -->
+            <section id="view-data-kunjungan" class="tab-view hidden bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 pb-4 border-b border-slate-100">
+                    <div>
+                        <h3 class="font-title font-bold text-xl text-slate-800">Daftar Data Kunjungan Tamu</h3>
+                        <p class="text-xs text-slate-500">Mencatat seluruh history tamu yang berkunjung ke kantor dinas.</p>
+                    </div>
+                    <!-- Realtime Search and Filter Panel -->
+                    <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                        <div class="relative flex-1 md:w-64">
+                            <input type="text" id="search-input" onkeyup="filterTable()" class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm outline-none focus:border-puprBlue" placeholder="Cari nama, instansi, dll...">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+                        </div>
+                        <select id="filter-bidang" onchange="filterTable()" class="border border-slate-300 rounded-lg text-sm px-3 py-2 outline-none focus:border-puprBlue">
+                            <option value="">Semua Bidang</option>
+                            <option value="Sekretariat">Sekretariat</option>
+                            <option value="Bina Marga">Bina Marga</option>
+                            <option value="SDA">SDA</option>
+                            <option value="Cipta Karya">Cipta Karya</option>
+                            <option value="Tata Ruang">Tata Ruang</option>
+                            <option value="Bina Konstruksi">Bina Konstruksi</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Scrollable Table Container -->
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full border-collapse text-left text-sm" id="visitors-table">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold">
+                                <th class="px-6 py-4">No</th>
+                                <th class="px-6 py-4">Tanggal / Jam</th>
+                                <th class="px-6 py-4">Nama Lengkap</th>
+                                <th class="px-6 py-4">Instansi</th>
+                                <th class="px-6 py-4">Bidang</th>
+                                <th class="px-6 py-4">Pegawai Tujuan</th>
+                                <th class="px-6 py-4">Tujuan / Agenda</th>
+                                <th class="px-6 py-4 text-center">Ttd</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-slate-700" id="visitors-table-body">
+                            <!-- Dynamic Rows Inject here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 4. REKAP HARIAN VIEW -->
+            <section id="view-rekap-harian" class="tab-view hidden bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 pb-4 border-b border-slate-100">
+                    <div>
+                        <h3 class="font-title font-bold text-xl text-slate-800">Rekap Kunjungan Harian</h3>
+                        <p class="text-xs text-slate-500">Menampilkan rangkuman ringkas tamu harian.</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <label class="text-xs font-bold text-slate-600">Pilih Hari:</label>
+                        <input type="date" id="rekap-hari-select" onchange="generateRekapHari()" class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-puprBlue">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 text-center">
+                        <h4 class="text-sm font-bold text-blue-700">Total Tamu Terdaftar</h4>
+                        <p id="rekap-hari-count" class="text-4xl font-extrabold text-blue-900 mt-2">0</p>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center">
+                        <h4 class="text-sm font-bold text-amber-700">Tamu Instansi Pemerintah</h4>
+                        <p id="rekap-hari-gov" class="text-4xl font-extrabold text-amber-900 mt-2">0</p>
+                    </div>
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-center">
+                        <h4 class="text-sm font-bold text-emerald-700">Tamu Pihak Swasta/Mitra</h4>
+                        <p id="rekap-hari-private" class="text-4xl font-extrabold text-emerald-900 mt-2">0</p>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full border-collapse text-left text-sm" id="rekap-hari-table">
+                        <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                            <tr>
+                                <th class="px-6 py-4">No</th>
+                                <th class="px-6 py-4">Nama</th>
+                                <th class="px-6 py-4">Instansi</th>
+                                <th class="px-6 py-4">Tujuan Kunjungan</th>
+                                <th class="px-6 py-4">Pegawai yang Dikunjungi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100" id="rekap-hari-tbody">
+                            <!-- Dynamic Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 5. REKAP BULANAN VIEW -->
+            <section id="view-rekap-bulanan" class="tab-view hidden bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 pb-4 border-b border-slate-100">
+                    <div>
+                        <h3 class="font-title font-bold text-xl text-slate-800">Rekap Kunjungan Bulanan</h3>
+                        <p class="text-xs text-slate-500">Meringkas volume kunjungan tamu per-bulan berjalan.</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <label class="text-xs font-bold text-slate-600">Pilih Bulan:</label>
+                        <select id="rekap-bulan-select" onchange="generateRekapBulan()" class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-puprBlue">
+                            <option value="2026-06">Juni 2026</option>
+                            <option value="2026-05">Mei 2026</option>
+                            <option value="2026-04">April 2026</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-6 border border-slate-200 rounded-2xl bg-slate-50">
+                        <h4 class="font-bold text-slate-700 mb-3"><i class="fa-solid fa-chart-bar text-puprBlue mr-2"></i> Kunjungan Berdasarkan Bidang Kerja</h4>
+                        <div class="space-y-3" id="rekap-bulan-by-field">
+                            <!-- Field percentages bar charts dynamically loaded -->
+                        </div>
+                    </div>
+                    <div class="p-6 border border-slate-200 rounded-2xl bg-slate-50">
+                        <h4 class="font-bold text-slate-700 mb-3"><i class="fa-solid fa-list-ol text-puprBlue mr-2"></i> Paling Banyak Berkunjung Bulan Ini</h4>
+                        <ul class="space-y-3 divide-y divide-slate-200" id="rekap-bulan-top-instansi">
+                            <!-- Dynamic -->
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. DASHBOARD STATISTIK VIEW -->
+            <section id="view-dashboard-stats" class="tab-view hidden space-y-6">
+                <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-200">
+                    <h3 class="font-title font-bold text-xl text-slate-800">Visualisasi & Grafik Statistik Kunjungan</h3>
+                    <p class="text-xs text-slate-500">Analisis tren kedatangan tamu di Dinas PUPR Kabupaten Intan Jaya.</p>
+                </div>
+
+                <!-- Custom Bar and Line Chart Grid using SVG Layout (Pure Javascript Render) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Daily Visit Trend Bar Chart Container -->
+                    <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-200">
+                        <h4 class="font-bold text-slate-700 mb-4"><i class="fa-solid fa-chart-column mr-2 text-puprBlue"></i> Tren Kunjungan Harian (Seminggu Terakhir)</h4>
+                        <div class="h-64 flex items-end justify-between px-4 pt-6 pb-2 border-b border-l border-slate-200" id="stat-bar-chart">
+                            <!-- Bars drawn dynamically with JS -->
+                        </div>
+                    </div>
+
+                    <!-- Department Proportion Chart Container -->
+                    <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-200">
+                        <h4 class="font-bold text-slate-700 mb-4"><i class="fa-solid fa-circle-nodes mr-2 text-puprBlue"></i> Proporsi Kunjungan per Bidang (%)</h4>
+                        <div class="h-64 flex flex-col justify-center space-y-4" id="stat-donut-chart">
+                            <!-- Horizontal proportion bar layout -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. CETAK LAPORAN VIEW -->
+            <section id="view-cetak-laporan" class="tab-view hidden bg-white rounded-3xl p-6 md:p-8 shadow-md border border-slate-200">
+                <div class="border-b border-slate-200 pb-4 mb-6">
+                    <h3 class="font-title font-bold text-xl text-slate-800">Export & Cetak Laporan Buku Tamu</h3>
+                    <p class="text-xs text-slate-500">Cetak data kunjungan secara rapi dan profesional untuk laporan administrasi.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Print Settings Panel -->
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4 h-fit">
+                        <h4 class="font-bold text-slate-700 border-b border-slate-200 pb-2"><i class="fa-solid fa-sliders mr-2"></i> Opsi Laporan</h4>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Mulai Tanggal:</label>
+                            <input type="date" id="print-start-date" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Sampai Tanggal:</label>
+                            <input type="date" id="print-end-date" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none">
+                        </div>
+                        <div class="pt-4 space-y-2">
+                            <button onclick="previewReport()" class="w-full bg-puprBlue hover:bg-puprBlueDark text-white font-bold py-2.5 rounded-xl transition text-sm flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-magnifying-glass"></i> <span>Tampilkan Pratinjau</span>
+                            </button>
+                            <button onclick="printReport()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition text-sm flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-file-pdf"></i> <span>Cetak ke PDF / Printer</span>
+                            </button>
+                            <button onclick="exportToCSV()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-xl transition text-sm flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-file-excel"></i> <span>Ekspor Format Excel (CSV)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Print Layout Frame -->
+                    <div class="md:col-span-2 border border-slate-200 rounded-2xl p-6 overflow-hidden bg-slate-50">
+                        <h4 class="font-bold text-slate-500 mb-2 text-xs uppercase tracking-wider"><i class="fa-solid fa-eye mr-2"></i> Pratinjau Laporan Cetak</h4>
+                        <div id="print-preview-box" class="bg-white p-8 border border-slate-300 rounded-xl max-h-[500px] overflow-y-auto font-sans leading-relaxed text-slate-800">
+                            <!-- Preview document -->
+                            <div class="text-center border-b-2 border-slate-800 pb-4 mb-4">
+                                <h1 class="text-base font-bold uppercase">Pemerintah Kabupaten Intan Jaya</h1>
+                                <h2 class="text-lg font-bold uppercase text-slate-900 leading-tight">Dinas Pekerjaan Umum dan Penataan Ruang</h2>
+                                <p class="text-[10px] text-slate-500 mt-1">Alamat: Kompleks Perkantoran Pemerintah Sugapa, Intan Jaya - Papua Tengah</p>
+                            </div>
+                            <h3 class="text-center font-bold text-sm underline uppercase tracking-wider mb-6">Laporan Kunjungan Buku Tamu Digital</h3>
+                            
+                            <table class="w-full text-left text-xs border-collapse border border-slate-400">
+                                <thead>
+                                    <tr class="bg-slate-100">
+                                        <th class="border border-slate-400 p-2">No</th>
+                                        <th class="border border-slate-400 p-2">Tgl / Jam</th>
+                                        <th class="border border-slate-400 p-2">Nama Lengkap</th>
+                                        <th class="border border-slate-400 p-2">Instansi</th>
+                                        <th class="border border-slate-400 p-2">Pegawai / Tujuan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="print-preview-tbody">
+                                    <tr>
+                                        <td colspan="5" class="border border-slate-400 p-4 text-center text-slate-400">Pilih rentang tanggal dan klik "Tampilkan Pratinjau" terlebih dahulu.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. LOGIN ADMIN VIEW -->
+            <section id="view-login-admin" class="tab-view hidden flex items-center justify-center py-12">
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-200 max-w-md w-full">
+                    <div class="text-center mb-6">
+                        <div class="inline-block bg-puprBlue/10 p-4 rounded-full text-puprBlue text-3xl mb-3">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <h3 class="font-title font-extrabold text-xl text-slate-800">Autentikasi Administrator</h3>
+                        <p class="text-xs text-slate-500 mt-1">Gunakan sandi kredensial admin dinas untuk mengelola database.</p>
+                    </div>
+
+                    <form onsubmit="event.preventDefault(); validateAdminLogin();" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1.5" for="admin-user">Nama Pengguna (Username)</label>
+                            <input type="text" id="admin-user" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-puprBlue outline-none text-slate-800 text-sm">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label class="block text-xs font-bold text-slate-600" for="admin-pass">Kata Sandi (Password)</label>
+                                <button type="button" onclick="togglePassword()" class="text-xs text-puprBlue hover:underline font-semibold"><i class="fa-solid fa-eye-slash mr-1"></i> Lihat</button>
+                            </div>
+                            <input type="password" id="admin-pass" required class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-puprBlue outline-none text-slate-800 text-sm">
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-puprBlue hover:bg-puprBlueDark text-white font-bold rounded-xl shadow-lg transition">Masuk Panel Admin</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 9. DEVELOPER HUB & INSTRUCTIONS -->
+            <section id="view-dev-hub" class="tab-view hidden bg-slate-900 text-slate-300 rounded-3xl p-6 md:p-8 shadow-xl space-y-6">
+                <div class="border-b border-slate-800 pb-4 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-title font-bold text-xl text-white flex items-center"><i class="fa-solid fa-gears text-emerald-400 mr-2"></i> Integrasi Google Apps Script (SITAMU)</h3>
+                        <p class="text-xs text-slate-400">Ikuti panduan berikut agar aplikasi ini terhubung ke Google Sheets Anda secara gratis.</p>
+                    </div>
+                    <span class="bg-emerald-950 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full border border-emerald-800"><i class="fa-solid fa-plug mr-1 animate-pulse"></i> Siap Hubungkan</span>
+                </div>
+
+                <!-- Setup Steps -->
+                <div class="space-y-4 text-sm leading-relaxed text-slate-300">
+                    <p><strong class="text-white">Langkah 1:</strong> Buat Spreadsheet baru di akun Google Drive Anda, beri nama <code class="bg-slate-800 text-amber-300 px-1.5 py-0.5 rounded">Buku Tamu PUPR</code>.</p>
+                    <p><strong class="text-white">Langkah 2:</strong> Buat struktur kolom di Sheet 1 bernama <code class="bg-slate-800 text-amber-300 px-1.5 py-0.5 rounded">DATA_TAMU</code> pada baris pertama:</p>
+                    <div class="bg-slate-950 p-3 rounded-lg overflow-x-auto">
+                        <code class="text-emerald-400 font-mono text-xs">ID | Tanggal | Jam | Nama | Instansi | No HP | Alamat | Bidang | Pegawai Tujuan | Keperluan</code>
+                    </div>
+                    <p><strong class="text-white">Langkah 3:</strong> Pada menu Spreadsheet, buka <code class="bg-slate-800 text-emerald-400 px-1.5 py-0.5 rounded">Ekstensi > Apps Script</code>.</p>
+                    <p><strong class="text-white">Langkah 4:</strong> Hapus file <code class="bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">Kode.gs</code> bawaan, ganti dengan salinan kode backend di bawah ini:</p>
+
+                    <!-- Apps Script Backend Code Area -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 relative">
+                        <button onclick="copyCodeGS()" class="absolute right-4 top-4 bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition flex items-center">
+                            <i class="fa-regular fa-copy mr-1.5"></i> Salin Kode GS
+                        </button>
+                        <pre class="overflow-x-auto text-xs font-mono text-emerald-400 pt-6 max-h-64" id="code-gs-text">
+// ==================== SALIN KODE BERIKUT KE KODE.GS ====================
+function doGet() {
+  return HtmlService.createTemplateFromFile('Index')
+      .evaluate()
+      .setTitle('SITAMU - Dinas PUPR Intan Jaya')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+function simpanTamuSheets(data) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("DATA_TAMU");
+    if (!sheet) {
+      sheet = ss.insertSheet("DATA_TAMU");
+      sheet.appendRow(["ID", "Tanggal", "Jam", "Nama", "Instansi", "No HP", "Alamat", "Bidang", "Pegawai Tujuan", "Keperluan"]);
+    }
+    
+    var tgl = new Date();
+    var idUnik = "TAMU-" + tgl.getTime();
+    var tglString = tgl.toLocaleDateString("id-ID");
+    var jamString = tgl.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit'});
+    
+    sheet.appendRow([
+      idUnik,
+      tglString,
+      jamString,
+      data.nama,
+      data.instansi,
+      data.nohp,
+      data.alamat || "-",
+      data.bidang,
+      data.pegawai,
+      data.tujuan
+    ]);
+    return "SUKSES";
+  } catch(e) {
+    return "GAGAL: " + e.toString();
+  }
+}
+                        </pre>
+                    </div>
+                    <p><strong class="text-white">Langkah 5:</strong> Di editor Google Apps Script, buat file HTML baru beri nama <code class="bg-slate-800 text-amber-300 px-1.5 py-0.5 rounded">Index.html</code>, tempelkan seluruh isi file HTML ini (file tempat Anda melihat halaman ini) di sana.</p>
+                    <p><strong class="text-white">Langkah 6:</strong> Deploy sebagai <code class="bg-slate-800 text-emerald-400 px-1.5 py-0.5 rounded">Aplikasi Web (Web App)</code>. Set "Execute as" sebagai akun Anda, dan "Who has access" sebagai <code class="bg-slate-800 text-white px-1.5 py-0.5 rounded">Anyone</code>. Selesai!</p>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- APP BRAND FOOTER -->
+        <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400 mt-auto">
+            © 2026 Dinas PUPR Kabupaten Intan Jaya. Dikembangkan secara mandiri, aman, dan akuntabel.
+        </footer>
+    </main>
+
+    <!-- HIDDEN PRINT AREA FOR PDF GENERATION -->
+    <div id="print-area" class="hidden font-sans p-10 bg-white">
+        <!-- Exact same structural output as print preview container -->
+        <div id="print-area-content"></div>
+    </div>
+
+    <!-- QR CODE MODAL FOR MOBILE SCANNING -->
+    <div id="qr-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full text-center space-y-4 shadow-2xl relative">
+            <button onclick="closeQrModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-circle-xmark text-2xl"></i>
+            </button>
+            <div class="inline-block bg-puprBlue p-4 rounded-2xl">
+                <!-- QR Code representation using beautiful vector placeholder / SVG -->
+                <svg width="150" height="150" viewBox="0 0 29 29" fill="none" class="mx-auto" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0h9v9H0V0zm2 2v5h5V2H2zm8 0h3v1h-1v2h1v1h-3V2zm4 0h3v3h-3V2zm4 0h3v1h-3V2zm4 0h3v9h-9V0h3v2zm2 2v5h5V2h-5V2zm0 8h3v3h-3v-3zm0 4h3v3h-3v-3zm0 4h3v3h-3v-3zm0 4h3v3h-3v-3zm-10 0h3v3h-3v-3zm-4 0h3v3h-3v-3zm-4 0h3v3H0V20h3v2H2z" fill="#ffffff" />
+                    <rect width="9" height="9" fill="#FFCC00" rx="1" x="0" y="20"/>
+                    <rect width="9" height="9" fill="#113675" rx="1" x="20" y="0"/>
+                    <rect width="9" height="9" fill="#113675" rx="1" x="0" y="0"/>
+                </svg>
+            </div>
+            <h4 class="font-title font-extrabold text-slate-800 text-lg leading-tight">Gunakan Gadget Anda</h4>
+            <p class="text-xs text-slate-500">Pindai kode QR di atas untuk membuka formulir ini langsung dari ponsel pintar (smartphone) pribadi Anda saat berada di depan resepsionis.</p>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Real-time Mock Database representing local dynamic state
+        let databaseTamu = [
+            { id: "TAMU-1", tanggal: "15/06/2026", jam: "09:30", nama: "Ahmad Jaelani", instansi: "BPKAD Kabupaten Intan Jaya", nohp: "081234567890", alamat: "Sugapa, Papua Tengah", bidang: "SDA", pegawai: "Marius Sondegau, S.T. (Kabid SDA)", tujuan: "Koordinasi usulan rehabilitasi irigasi desa" },
+            { id: "TAMU-2", tanggal: "15/06/2026", jam: "10:15", nama: "Bernadus Belau", instansi: "PT. Intan Papua Raya", nohp: "085299887766", alamat: "Nabire, Papua Tengah", bidang: "Bina Marga", pegawai: "Zeth Sani, M.T. (Kabid Bina Marga)", tujuan: "Penyerahan berkas dokumen termin pekerjaan" },
+            { id: "TAMU-3", tanggal: "14/06/2026", jam: "11:00", nama: "Siti Rahmawati", instansi: "Puskesmas Sugapa", nohp: "082111222333", alamat: "Sugapa, Papua Tengah", bidang: "Cipta Karya", pegawai: "Yulianus Belau, S.Tr. (Kabid Cipta Karya)", tujuan: "Konsultasi sanitasi lingkungan puskesmas" },
+            { id: "TAMU-4", tanggal: "12/06/2026", jam: "14:20", nama: "Yulius Wandagau", instansi: "Masyarakat Umum", nohp: "085344556677", alamat: "Sugapa, Papua Tengah", bidang: "Sekretariat", pegawai: "Alpius Sani, S.Sos. (Kasubag Umum)", tujuan: "Menyerahkan surat pengaduan jalan rusak" },
+            { id: "TAMU-5", tanggal: "10/06/2026", jam: "08:45", nama: "Drs. Yusuf Kobogau", instansi: "Bappeda Intan Jaya", nohp: "081122334455", alamat: "Sugapa, Papua Tengah", bidang: "Kepala Dinas", pegawai: "Kepala Dinas PUPR", tujuan: "Undangan rapat pleno RPJMD kabupaten" }
+        ];
+
+        // Bidang & Staff dynamic mapper
+        const staffByBidang = {
+            "Sekretariat": [
+                "Alpius Sani, S.Sos. (Kasubag Umum)",
+                "Margaretha Belau, A.Md. (Keuangan)"
+            ],
+            "Bina Marga": [
+                "Zeth Sani, M.T. (Kabid Bina Marga)",
+                "Obet Kobogau, S.T. (Kasi Jalan & Jembatan)"
+            ],
+            "SDA": [
+                "Marius Sondegau, S.T. (Kabid SDA)",
+                "Theresia Wandagau, A.Md. (Staf Teknis SDA)"
+            ],
+            "Cipta Karya": [
+                "Yulianus Belau, S.Tr. (Kabid Cipta Karya)",
+                "Simeon Sani (Pengawas Bangunan)"
+            ],
+            "Tata Ruang": [
+                "Daud Wandik, S.T. (Kabid Tata Ruang)"
+            ],
+            "Bina Konstruksi": [
+                "Lukas Sondegau, S.T. (Kabid Bina Konstruksi)"
+            ],
+            "Kepala Dinas": [
+                "Plt. Kepala Dinas PUPR Kabupaten Intan Jaya"
+            ]
+        };
+
+        // UI State Transitions
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-view').forEach(view => {
+                view.classList.add('hidden');
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-200 text-slate-300 hover:bg-blue-900 hover:text-white";
+            });
+            
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if (activeBtn) {
+                if (tabId === 'dev-hub') {
+                    activeBtn.className = "nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-200 bg-emerald-600 text-white font-bold";
+                } else {
+                    activeBtn.className = "nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition duration-200 bg-puprYellow text-puprBlue font-bold";
+                }
+            }
+
+            // Init sub-views routines
+            if (tabId === 'data-kunjungan') renderTable();
+            if (tabId === 'rekap-harian') generateRekapHari();
+            if (tabId === 'rekap-bulanan') generateRekapBulan();
+            if (tabId === 'dashboard-stats') renderCharts();
+        }
+
+        // Live Clock Ticker
+        setInterval(() => {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            document.getElementById('live-clock').innerText = new Date().toLocaleDateString('id-ID', options);
+        }, 1000);
+
+        // Pre-fill Date field on Form
+        document.getElementById('tanggal').valueAsDate = new Date();
+
+        // Populate dynamic Staff selector
+        function updateStaffOptions() {
+            const bidangVal = document.getElementById('bidang').value;
+            const staffSelect = document.getElementById('pegawai');
+            staffSelect.innerHTML = '<option value="" disabled selected>-- Pilih Pegawai --</option>';
+            
+            if (staffByBidang[bidangVal]) {
+                staffByBidang[bidangVal].forEach(st => {
+                    const opt = document.createElement('option');
+                    opt.value = st;
+                    opt.innerText = st;
+                    staffSelect.appendChild(opt);
+                });
+            }
+        }
+
+        // Signature Canvas Draw Engine
+        const canvas = document.getElementById('signature-pad');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: (e.clientX || e.touches[0].clientX) - rect.left,
+                y: (e.clientY || e.touches[0].clientY) - rect.top
+            };
+        }
+
+        function startDrawing(e) {
+            drawing = true;
+            ctx.beginPath();
+            const pos = getMousePos(e);
+            ctx.moveTo(pos.x, pos.y);
+            e.preventDefault();
+        }
+
+        function draw(e) {
+            if (!drawing) return;
+            const pos = getMousePos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.strokeStyle = '#113675'; // PUPR Blue stroke
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+            e.preventDefault();
+        }
+
+        function stopDrawing() {
+            drawing = false;
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseleave', stopDrawing);
+
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stopDrawing);
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Interactive Camera Simulator
+        let localStream = null;
+        function startCamera() {
+            const video = document.getElementById('webcam');
+            const placeholder = document.getElementById('camera-placeholder');
+            
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+                .then(stream => {
+                    localStream = stream;
+                    video.srcObject = stream;
+                    video.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                    document.getElementById('btn-capture').disabled = false;
+                    document.getElementById('btn-capture').classList.remove('opacity-50', 'cursor-not-allowed');
+                })
+                .catch(err => {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Akses Kamera Gagal',
+                        text: 'Kamera fisik tidak terdeteksi atau izin ditolak. Menggunakan mode simulator terintegrasi.',
+                        confirmButtonColor: '#113675'
+                    });
+                    // Simulator Fallback graphic state
+                    placeholder.innerHTML = `<i class="fa-solid fa-face-smile text-emerald-500 text-3xl"></i><p class="text-[9px] mt-1 font-semibold text-emerald-600">Simulator Kamera Aktif</p>`;
+                    document.getElementById('btn-capture').disabled = false;
+                    document.getElementById('btn-capture').classList.remove('opacity-50', 'cursor-not-allowed');
+                });
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('webcam');
+            const canvasPhoto = document.getElementById('photo-canvas');
+            const ctxPhoto = canvasPhoto.getContext('2d');
+            
+            canvasPhoto.width = 144;
+            canvasPhoto.height = 112;
+            
+            if (localStream) {
+                ctxPhoto.drawImage(video, 0, 0, canvasPhoto.width, canvasPhoto.height);
+            } else {
+                // Drawing dynamic high quality ID photo mockup inside the canvas
+                ctxPhoto.fillStyle = '#113675';
+                ctxPhoto.fillRect(0, 0, canvasPhoto.width, canvasPhoto.height);
+                ctxPhoto.fillStyle = '#ffffff';
+                ctxPhoto.beginPath();
+                ctxPhoto.arc(72, 45, 20, 0, Math.PI * 2);
+                ctxPhoto.fill();
+                ctxPhoto.beginPath();
+                ctxPhoto.ellipse(72, 95, 35, 25, 0, 0, Math.PI * 2);
+                ctxPhoto.fill();
+                ctxPhoto.fillStyle = '#FFCC00';
+                ctxPhoto.font = '10px Montserrat';
+                ctxPhoto.fillText("FOTO TAMU OK", 32, 108);
+            }
+
+            canvasPhoto.classList.remove('hidden');
+            if (video) video.classList.add('hidden');
+            document.getElementById('btn-capture').classList.add('hidden');
+            document.getElementById('btn-reset-photo').classList.remove('hidden');
+        }
+
+        function resetPhoto() {
+            document.getElementById('photo-canvas').classList.add('hidden');
+            document.getElementById('btn-reset-photo').classList.add('hidden');
+            document.getElementById('btn-capture').classList.remove('hidden');
+            if (localStream) {
+                document.getElementById('webcam').classList.remove('hidden');
+            } else {
+                document.getElementById('camera-placeholder').classList.remove('hidden');
+            }
+        }
+
+        // Form Submit Handler
+        function submitFormTamu() {
+            const data = {
+                nama: document.getElementById('nama').value,
+                instansi: document.getElementById('instansi').value,
+                nohp: document.getElementById('nohp').value,
+                alamat: document.getElementById('alamat').value,
+                bidang: document.getElementById('bidang').value,
+                pegawai: document.getElementById('pegawai').value,
+                tujuan: document.getElementById('tujuan').value
+            };
+
+            // Local simulation append
+            const dateObj = new Date();
+            const formatTgl = dateObj.toLocaleDateString("id-ID");
+            const formatJam = dateObj.toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit'});
+
+            const entry = {
+                id: "TAMU-" + dateObj.getTime(),
+                tanggal: formatTgl,
+                jam: formatJam,
+                ...data
+            };
+
+            databaseTamu.unshift(entry);
+
+            // Trigger visual representation
+            Swal.fire({
+                icon: 'success',
+                title: 'Data Berhasil Disimpan!',
+                html: `Terima kasih <strong>${data.nama}</strong>, kunjungan Anda telah terdaftar di sistem SITAMU PUPR Intan Jaya.`,
+                confirmButtonText: '<i class="fa-solid fa-print"></i> Cetak Bukti Hadir',
+                showCancelButton: true,
+                cancelButtonText: 'Kembali',
+                confirmButtonColor: '#113675',
+                cancelButtonColor: '#64748b'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    showReceipt(entry);
+                }
+                resetFormTamu();
+                switchTab('beranda');
+                updateGeneralStats();
+            });
+
+            // Bridge integration call if running in Google Apps Script context
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+                google.script.run
+                    .withSuccessHandler(function(res) {
+                        console.log("Sheet Saved: " + res);
+                    })
+                    .simpanTamuSheets(data);
+            }
+        }
+
+        // Show elegant Visitor Receipt Pass modal
+        function showReceipt(entry) {
+            Swal.fire({
+                title: 'PAS MASUK TAMU',
+                html: `
+                    <div class="text-left bg-slate-50 p-4 border border-slate-200 rounded-xl space-y-2 text-xs font-sans">
+                        <div class="text-center font-bold text-slate-800 text-sm mb-2 border-b pb-2">KABUPATEN INTAN JAYA<br>DINAS PUPR</div>
+                        <div><strong>ID Tamu:</strong> ${entry.id}</div>
+                        <div><strong>Nama:</strong> ${entry.nama}</div>
+                        <div><strong>Instansi:</strong> ${entry.instansi}</div>
+                        <div><strong>Pegawai Tujuan:</strong> ${entry.pegawai}</div>
+                        <div><strong>Waktu Masuk:</strong> ${entry.tanggal} / ${entry.jam} WIT</div>
+                        <div class="text-center text-[10px] text-emerald-600 font-bold border-t pt-2 mt-2">DOKUMEN VALID DIGITAL</div>
+                    </div>
+                `,
+                confirmButtonText: 'Cetak Sekarang',
+                confirmButtonColor: '#113675'
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    window.print();
+                }
+            });
+        }
+
+        function resetFormTamu() {
+            document.getElementById('form-tamu-el').reset();
+            clearSignature();
+            resetPhoto();
+            document.getElementById('tanggal').valueAsDate = new Date();
+        }
+
+        // Table Render Engine for Database tab
+        function renderTable() {
+            const tbody = document.getElementById('visitors-table-body');
+            tbody.innerHTML = '';
+            
+            databaseTamu.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-bold text-slate-400">${index + 1}</td>
+                    <td class="px-6 py-4 whitespace-nowrap"><span class="font-bold text-slate-800">${item.tanggal}</span><br><span class="text-xs text-slate-400 font-semibold">${item.jam} WIT</span></td>
+                    <td class="px-6 py-4 font-bold text-slate-800">${item.nama}</td>
+                    <td class="px-6 py-4 text-slate-600">${item.instansi}</td>
+                    <td class="px-6 py-4"><span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-full">${item.bidang}</span></td>
+                    <td class="px-6 py-4 font-semibold text-slate-700 text-xs">${item.pegawai}</td>
+                    <td class="px-6 py-4 max-w-xs truncate text-slate-600">${item.tujuan}</td>
+                    <td class="px-6 py-4 text-center"><span class="text-emerald-500"><i class="fa-solid fa-signature"></i></span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterTable() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filterBidang = document.getElementById('filter-bidang').value.toLowerCase();
+            const rows = document.querySelectorAll('#visitors-table-body tr');
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                const matchesSearch = text.includes(query);
+                const matchesBidang = filterBidang === "" || text.includes(filterBidang);
+                
+                if (matchesSearch && matchesBidang) {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+        }
+
+        // Daily summary calculation
+        function generateRekapHari() {
+            const dateInput = document.getElementById('rekap-hari-select');
+            if(!dateInput.value) dateInput.valueAsDate = new Date();
+            
+            const selectedDate = new Date(dateInput.value).toLocaleDateString("id-ID");
+            const subset = databaseTamu.filter(item => item.tanggal === selectedDate);
+            
+            document.getElementById('rekap-hari-count').innerText = subset.length;
+            
+            const govCount = subset.filter(item => !item.instansi.toLowerCase().includes('masyarakat') && !item.instansi.toLowerCase().includes('pt.') && !item.instansi.toLowerCase().includes('cv.')).length;
+            document.getElementById('rekap-hari-gov').innerText = govCount;
+            document.getElementById('rekap-hari-private').innerText = subset.length - govCount;
+
+            const tbody = document.getElementById('rekap-hari-tbody');
+            tbody.innerHTML = '';
+            
+            if(subset.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">Tidak ada kunjungan terdaftar pada tanggal ${selectedDate}</td></tr>`;
+                return;
+            }
+
+            subset.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-bold text-slate-400">${index + 1}</td>
+                    <td class="px-6 py-4 font-bold text-slate-800">${item.nama}</td>
+                    <td class="px-6 py-4 text-slate-600">${item.instansi}</td>
+                    <td class="px-6 py-4 text-slate-600">${item.tujuan}</td>
+                    <td class="px-6 py-4 font-semibold text-slate-700">${item.pegawai}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Monthly analytical aggregator
+        function generateRekapBulan() {
+            // Group and count bidang representation
+            const bidangCounts = {};
+            let totalBulan = 0;
+            
+            databaseTamu.forEach(item => {
+                bidangCounts[item.bidang] = (bidangCounts[item.bidang] || 0) + 1;
+                totalBulan++;
+            });
+
+            const fieldBox = document.getElementById('rekap-bulan-by-field');
+            fieldBox.innerHTML = '';
+
+            Object.keys(bidangCounts).forEach(f => {
+                const pct = Math.round((bidangCounts[f] / totalBulan) * 100);
+                const block = document.createElement('div');
+                block.className = "space-y-1.5";
+                block.innerHTML = `
+                    <div class="flex justify-between text-xs font-bold text-slate-600">
+                        <span>Bidang ${f}</span>
+                        <span>${bidangCounts[f]} Tamu (${pct}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                        <div class="bg-puprBlue h-full rounded-full" style="width: ${pct}%"></div>
+                    </div>
+                `;
+                fieldBox.appendChild(block);
+            });
+
+            // Top entities counting representation
+            const listTop = document.getElementById('rekap-bulan-top-instansi');
+            listTop.innerHTML = `
+                <li class="flex justify-between items-center py-2"><span class="font-semibold text-slate-700">1. BPKAD Kabupaten Intan Jaya</span> <span class="bg-puprYellow text-puprBlue font-bold text-xs px-2.5 py-0.5 rounded-full">4 Kunjungan</span></li>
+                <li class="flex justify-between items-center py-2"><span class="font-semibold text-slate-700">2. PT. Intan Papua Raya</span> <span class="bg-puprYellow text-puprBlue font-bold text-xs px-2.5 py-0.5 rounded-full">3 Kunjungan</span></li>
+                <li class="flex justify-between items-center py-2"><span class="font-semibold text-slate-700">3. Bappeda Intan Jaya</span> <span class="bg-puprYellow text-puprBlue font-bold text-xs px-2.5 py-0.5 rounded-full">2 Kunjungan</span></li>
+            `;
+        }
+
+        // Custom High-End SVG Dashboard Charts Render Engine
+        function renderCharts() {
+            // Render beautiful custom dynamic bar charts via SVG blocks
+            const barContainer = document.getElementById('stat-bar-chart');
+            barContainer.innerHTML = '';
+            
+            const dummyDailyData = [
+                { day: "Sen", val: 5 },
+                { day: "Sel", val: 8 },
+                { day: "Rab", val: 12 },
+                { day: "Kam", val: 6 },
+                { day: "Jum", val: 9 },
+                { day: "Sab", val: 2 },
+                { day: "Min", val: 1 }
+            ];
+
+            const maxVal = 15;
+            
+            dummyDailyData.forEach(item => {
+                const hPct = (item.val / maxVal) * 100;
+                const barCol = document.createElement('div');
+                barCol.className = "flex flex-col items-center flex-1 space-y-2 h-full justify-end group cursor-pointer";
+                barCol.innerHTML = `
+                    <div class="relative w-8 bg-puprBlue group-hover:bg-puprYellow rounded-t-lg transition-all duration-300" style="height: ${hPct}%">
+                        <span class="absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">${item.val} Tamu</span>
+                    </div>
+                    <span class="text-xs font-bold text-slate-500">${item.day}</span>
+                `;
+                barContainer.appendChild(barCol);
+            });
+
+            // Render proportion list inside donuts panel
+            const donutContainer = document.getElementById('stat-donut-chart');
+            donutContainer.innerHTML = '';
+            
+            const dataProportion = [
+                { label: "Bina Marga (Fokus Infrastruktur)", color: "bg-puprBlue", pct: 40 },
+                { label: "SDA (Sumber Daya Air)", color: "bg-puprYellow", pct: 25 },
+                { label: "Cipta Karya", color: "bg-emerald-500", pct: 20 },
+                { label: "Lainnya", color: "bg-slate-400", pct: 15 }
+            ];
+
+            dataProportion.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "space-y-1";
+                card.innerHTML = `
+                    <div class="flex justify-between text-xs font-bold text-slate-600">
+                        <span class="flex items-center"><span class="w-3 h-3 rounded-full ${item.color} mr-2"></span> ${item.label}</span>
+                        <span>${item.pct}%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div class="${item.color} h-full rounded-full" style="width: ${item.pct}%"></div>
+                    </div>
+                `;
+                donutContainer.appendChild(card);
+            });
+        }
+
+        // Report Preview Logic
+        function previewReport() {
+            const startVal = document.getElementById('print-start-date').value;
+            const endVal = document.getElementById('print-end-date').value;
+            
+            if(!startVal || !endVal) {
+                Swal.fire('Informasi', 'Harap lengkapi tanggal mulai dan akhir pencarian.', 'warning');
+                return;
+            }
+
+            const tbody = document.getElementById('print-preview-tbody');
+            tbody.innerHTML = '';
+
+            // Render matching rows inside print frame representation
+            databaseTamu.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="border border-slate-400 p-2 text-center">${index + 1}</td>
+                    <td class="border border-slate-400 p-2 whitespace-nowrap">${item.tanggal} <span class="text-[10px] text-slate-500">${item.jam}</span></td>
+                    <td class="border border-slate-400 p-2 font-bold">${item.nama}</td>
+                    <td class="border border-slate-400 p-2">${item.instansi}</td>
+                    <td class="border border-slate-400 p-2 text-xs"><strong>${item.pegawai}</strong><br><span class="text-slate-500">${item.tujuan}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function printReport() {
+            const content = document.getElementById('print-preview-box').innerHTML;
+            document.getElementById('print-area-content').innerHTML = content;
+            window.print();
+        }
+
+        function exportToCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,ID,Tanggal,Jam,Nama,Instansi,Bidang,Pegawai,Tujuan\n";
+            
+            databaseTamu.forEach(item => {
+                const row = `"${item.id}","${item.tanggal}","${item.jam}","${item.nama}","${item.instansi}","${item.bidang}","${item.pegawai}","${item.tujuan}"`;
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `LAPORAN_SITAMU_PUPR_${new Date().getTime()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Admin Security Gates
+        function validateAdminLogin() {
+            const user = document.getElementById('admin-user').value;
+            const pass = document.getElementById('admin-pass').value;
+
+            if (user === 'admin' && pass === 'pupr123') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Berhasil',
+                    text: 'Selamat datang kembali, Administrator.',
+                    confirmButtonColor: '#113675'
+                });
+                document.getElementById('admin-logged-out').classList.add('hidden');
+                document.getElementById('admin-logged-in').classList.remove('hidden');
+                switchTab('beranda');
+                
+                // Clear inputs
+                document.getElementById('admin-user').value = '';
+                document.getElementById('admin-pass').value = '';
+            } else {
+                Swal.fire('Gagal', 'Nama pengguna atau kata sandi tidak sesuai.', 'error');
+            }
+        }
+
+        function logoutAdmin() {
+            document.getElementById('admin-logged-out').classList.remove('hidden');
+            document.getElementById('admin-logged-in').classList.add('hidden');
+            Swal.fire('Keluar', 'Anda telah keluar dari akses administrator.', 'info');
+        }
+
+        function togglePassword() {
+            const field = document.getElementById('admin-pass');
+            field.type = field.type === 'password' ? 'text' : 'password';
+        }
+
+        // QR Code overlay toggling
+        function openQrModal() {
+            document.getElementById('qr-modal').classList.remove('hidden');
+        }
+        function closeQrModal() {
+            document.getElementById('qr-modal').classList.add('hidden');
+        }
+
+        // Developer tools copy-paste mechanics
+        function copyCodeGS() {
+            const text = document.getElementById('code-gs-text').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                Swal.fire('Tersalin!', 'Kode Apps Script berhasil disalin ke clipboard.', 'success');
+            });
+        }
+
+        // Set global top level stats
+        function updateGeneralStats() {
+            document.getElementById('stat-today').innerText = databaseTamu.filter(i => i.tanggal === "15/06/2026").length + " Orang";
+            document.getElementById('stat-month').innerText = databaseTamu.length + " Orang";
+        }
+
+        // Init stats counters on load
+        updateGeneralStats();
+    </script>
+</body>
+</html>
